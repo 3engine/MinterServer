@@ -1,0 +1,50 @@
+import { ethers, Contract } from 'ethers';
+import { gameWallet } from '../config/web3Config';
+
+const contractABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    type: 'function',
+  },
+];
+
+const contractAddress = process.env.CONTRACT_ADDRESS || '';
+if (!contractAddress) {
+  throw new Error('Contract address is not set in the environment variables');
+}
+const nftContract = new Contract(contractAddress, contractABI, gameWallet);
+
+/**
+ * Mint an NFT
+ * @param playerAddress - The address of the player to whom the NFT will be minted
+ * @param amount - The amount of NFTs to mint. Default is 1
+ */
+export async function mintNFTToPlayer(
+  playerAddress: string,
+  amount: number = 1,
+) {
+  try {
+    const tx = await nftContract.mint(playerAddress, amount);
+    await tx.wait();
+
+    return { status: 'success', message: 'NFT minted and transferred' };
+  } catch (error) {
+    console.error('Error in mintNFTToPlayer utility:', error);
+    return { status: 'error', message: (error as Error).message };
+  }
+}
+
+/**
+ * Validates if the provided address is a valid Ethereum address
+ * @param address The Ethereum address to validate
+ * @returns {boolean} True if the address is valid, false otherwise
+ */
+export function isValidEthereumAddress(address: string): boolean {
+  return ethers.isAddress(address);
+}

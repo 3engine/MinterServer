@@ -12,6 +12,23 @@ const contractABI = [
     outputs: [],
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '_address',
+        type: 'address',
+      },
+    ],
+    name: 'hasMinted',
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    type: 'function',
+  },
 ];
 
 const contractAddress = process.env.CONTRACT_ADDRESS || '';
@@ -19,6 +36,22 @@ if (!contractAddress) {
   throw new Error('Contract address is not set in the environment variables');
 }
 const nftContract = new Contract(contractAddress, contractABI, gameWallet);
+
+/**
+ * Check if user Minted already an NFT
+ * @param playerAddress - The address of the player
+ */
+export async function hasUserMintedNFT(
+  playerAddress: string,
+): Promise<boolean> {
+  try {
+    const hasMinted = await nftContract.hasMinted(playerAddress);
+    return hasMinted;
+  } catch (error) {
+    console.error('Error in hasUserMintedNFT utility:', error);
+    throw error;
+  }
+}
 
 /**
  * Mint an NFT

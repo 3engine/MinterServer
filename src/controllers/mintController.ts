@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {
   isValidEthereumAddress,
   mintNFTToPlayer,
+  hasUserMintedNFT,
 } from '../utils/contractUtils';
 
 export async function mintNFT(req: Request, res: Response) {
@@ -14,7 +15,13 @@ export async function mintNFT(req: Request, res: Response) {
         message: 'Invalid Ethereum address provided.',
       });
     }
+    const alreadyMinted = await hasUserMintedNFT(playerAddress);
 
+    if (alreadyMinted) {
+      return res
+        .status(400)
+        .send({ success: false, message: 'User has already minted an NFT' });
+    }
     const mintResult = await mintNFTToPlayer(playerAddress);
 
     if (mintResult.status === 'success') {

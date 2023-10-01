@@ -6,8 +6,7 @@ const contractABI = [
   {
     constant: false,
     inputs: [
-      { name: 'recipient', type: 'address' },
-      { name: 'amount', type: 'uint256' },
+      { name: '_to', type: 'address' }
     ],
     name: 'mint',
     outputs: [],
@@ -46,13 +45,22 @@ export async function hasUserMintedNFT(
   playerAddress: string,
 ): Promise<boolean> {
   try {
-    const player = await Player.findOne({ playerAddress });
+    let  player = await Player.findOne({ playerAddress });
 
     if (player && player.hasMinted) {
       return true;
     }
 
     const hasMinted = await nftContract.hasMinted(playerAddress);
+
+    if (!player && hasMinted) {
+      player = new Player({
+        playerAddress,
+        hasMinted: true,
+      });
+      await player.save();
+    }
+
     return hasMinted;
   } catch (error) {
     console.error('Error in hasUserMintedNFT utility:', error);
@@ -66,11 +74,10 @@ export async function hasUserMintedNFT(
  * @param amount - The amount of NFTs to mint. Default is 1
  */
 export async function mintNFTToPlayer(
-  playerAddress: string,
-  amount: number = 1,
+  playerAddress: string
 ) {
   try {
-    const tx = await nftContract.mint(playerAddress, amount);
+    const tx = await nftContract.mint(playerAddress);
     const receipt = await tx.wait();
 
     if (receipt.status === 1) {

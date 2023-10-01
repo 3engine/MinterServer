@@ -46,6 +46,12 @@ export async function hasUserMintedNFT(
   playerAddress: string,
 ): Promise<boolean> {
   try {
+    const player = await Player.findOne({ playerAddress });
+
+    if (player && player.hasMinted) {
+      return true;
+    }
+
     const hasMinted = await nftContract.hasMinted(playerAddress);
     return hasMinted;
   } catch (error) {
@@ -68,9 +74,9 @@ export async function mintNFTToPlayer(
     const receipt = await tx.wait();
 
     if (receipt.status === 1) {
-      const player = new Player({ address: playerAddress, hasMinted: true });
+      const player = new Player({ playerAddress, hasMinted: true });
       await player.save();
-  }
+    }
     return { status: 'success', message: 'NFT minted and transferred' };
   } catch (error) {
     console.error('Error in mintNFTToPlayer utility:', error);

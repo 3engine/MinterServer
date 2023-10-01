@@ -8,13 +8,12 @@ app.use(express.json());
 app.use(mongodbMiddleware);
 app.use('/api', mintRoute);
 
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
   const message = {
-    message: "Hello World!",
+    message: 'Hello World!',
   };
   res.send(message);
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

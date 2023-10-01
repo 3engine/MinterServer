@@ -1,5 +1,6 @@
 import { ethers, Contract } from 'ethers';
 import { gameWallet } from '../config/web3Config';
+import Player from '../models/playerModel';
 
 const contractABI = [
   {
@@ -64,8 +65,12 @@ export async function mintNFTToPlayer(
 ) {
   try {
     const tx = await nftContract.mint(playerAddress, amount);
-    await tx.wait();
+    const receipt = await tx.wait();
 
+    if (receipt.status === 1) {
+      const player = new Player({ address: playerAddress, hasMinted: true });
+      await player.save();
+  }
     return { status: 'success', message: 'NFT minted and transferred' };
   } catch (error) {
     console.error('Error in mintNFTToPlayer utility:', error);

@@ -1,15 +1,34 @@
 import { Request, Response, NextFunction } from 'express';
-
-export function authenticateRequest(
+import axios from 'axios';
+declare global {
+  namespace Express {
+    interface Request {
+      playerAddress?: string;
+    }
+  }
+}
+export async function checkSessionMiddleware (  
   req: Request,
   res: Response,
-  next: NextFunction,
-) {
-  const secretKey = req.headers['x-game-secret'];
+  next: NextFunction) {
+  try {
+    const apiKey = process.env.APIKEY_3ENGINE as string;
+    const sessionId: string = req.body.sessionId;
 
-  if (secretKey !== process.env.GAME_SECRET) {
-    return res.status(403).send('Unauthorized');
+    const response = await axios.get(`${process.env.API_3ENGINE}/player/session/status/${sessionId}`, {
+      headers: {
+        'x-api-key': apiKey
+      }
+    });
+
+    if (response.data.isActive) {
+      req.playerAddress = response.data.player.address;
+      next();
+    } else {
+      res.status(400).json({ error: 'Session is not active' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to check session status' });
   }
-
-  next();
-}
+};

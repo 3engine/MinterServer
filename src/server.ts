@@ -1,11 +1,12 @@
 import express from 'express';
 import mintRoute from './routes/mintRoute';
+import bodyParser from 'body-parser';
 import { mongodbMiddleware } from './config/db';
 
 const app = express();
 
-app.use(express.json());
 app.use(mongodbMiddleware);
+app.use(bodyParser.json()); 
 app.use('/api', mintRoute);
 
 app.get('/', (req, res) => {

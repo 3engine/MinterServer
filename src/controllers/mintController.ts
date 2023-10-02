@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response} from 'express';
 import {
   isValidEthereumAddress,
   mintNFTToPlayer,
@@ -7,8 +7,8 @@ import {
 
 export async function mintNFT(req: Request, res: Response) {
   try {
-    const playerAddress = req.body.address;
-
+    const playerAddress = req.playerAddress;
+    
     if (!isValidEthereumAddress(playerAddress)) {
       return res.status(400).send({
         success: false,

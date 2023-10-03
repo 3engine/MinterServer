@@ -13,9 +13,9 @@ export async function checkSessionMiddleware (
   next: NextFunction) {
   try {
     const apiKey = process.env.APIKEY_3ENGINE as string;
-    const sessionId: string = req.body.sessionId;
+    const address: string = req.body.address;
 
-    const response = await axios.get(`${process.env.API_3ENGINE}/player/session/status/${sessionId}`, {
+    const response = await axios.get(`${process.env.API_3ENGINE}/player/session/status?address=${address}`, {
       headers: {
         'x-api-key': apiKey
       }

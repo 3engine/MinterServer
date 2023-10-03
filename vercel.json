@@ -1,0 +1,7 @@
+{
+    "name": "Minter-Server",
+    "rewrites": [
+      { "source": "/.*", "destination": "/src/server" }
+    ]
+  }
+  

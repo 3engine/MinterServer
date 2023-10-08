@@ -28,7 +28,7 @@ export async function checkSessionMiddleware (
       res.status(400).json({ error: 'Session is not active' });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to check session status' });
+    console.error('Error details:', error.response?.data || error.message);
+    res.status(500).json(error.response?.data);
   }
 };

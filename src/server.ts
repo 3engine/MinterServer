@@ -1,10 +1,16 @@
 import express from 'express';
 import mintRoute from './routes/mintRoute';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import { mongodbMiddleware } from './config/db';
 
 const app = express();
-
+app.use(
+  cors({
+    credentials: true,
+    origin: true,
+  })
+);
 app.use(mongodbMiddleware);
 app.use(bodyParser.json()); 
 app.use('/api', mintRoute);
